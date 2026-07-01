@@ -19,6 +19,7 @@ from couple_match import MatchMode, compare_photos, format_report
 
 TOKEN_ENV = "TELEGRAM_BOT_TOKEN"
 UPLOAD_DIR_ENV = "FACEFUNBOT_UPLOAD_DIR"
+DOTENV_PATH = Path(__file__).with_name(".env")
 DEFAULT_UPLOAD_DIR = Path("uploaded_photos")
 DEFAULT_MODE: MatchMode = "face"
 
@@ -138,6 +139,22 @@ def safe_filename_part(value: str) -> str:
     return safe[:80] or "photo"
 
 
+def load_env_file(path: Path = DOTENV_PATH) -> None:
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip("'\"")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
 def build_application(token: str) -> Application:
     application = Application.builder().token(token).build()
     application.add_handler(CommandHandler("start", start))
@@ -152,6 +169,7 @@ def build_application(token: str) -> Application:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    load_env_file()
     token = os.environ.get(TOKEN_ENV)
     if not token:
         raise SystemExit(f"Set {TOKEN_ENV} before running the bot.")

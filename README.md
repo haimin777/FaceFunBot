@@ -42,12 +42,20 @@ python3 couple_match.py person_a.jpg person_b.jpg --mode face --json
 python3 -m pip install -r requirements.txt
 ```
 
-3. Start the bot:
+3. Put the token in `.env`:
+
+```env
+TELEGRAM_BOT_TOKEN=123456:your-token-here
+```
+
+4. Start the bot:
 
 ```bash
-export TELEGRAM_BOT_TOKEN="123456:your-token-here"
 python3 telegram_bot.py
 ```
+
+Real environment variables override `.env` values, so deployment platforms can
+still inject `TELEGRAM_BOT_TOKEN` normally.
 
 By default, every received photo is also saved on the server:
 
@@ -57,7 +65,7 @@ By default, every received photo is also saved on the server:
 To choose a different archive directory:
 
 ```bash
-export FACEFUNBOT_UPLOAD_DIR="/path/to/photo-archive"
+FACEFUNBOT_UPLOAD_DIR=/path/to/photo-archive
 python3 telegram_bot.py
 ```
 
